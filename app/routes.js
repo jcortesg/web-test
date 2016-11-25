@@ -23,7 +23,7 @@ export default function createRoutes(store) {
       name: 'home',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          System.import('containers/HomePage'),
+          System.import('containers/HomePage/index.jsx'),
         ]);
 
         const renderRoute = loadModule(cb);
@@ -34,6 +34,26 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
+      indexRoute: {
+        name: 'trips',
+        getComponent(nextState, cb) {
+          const importModules = Promise.all([
+            System.import('containers/Trips/reducer'),
+            System.import('containers/Trips/sagas'),
+            System.import('containers/Trips/index.jsx'),
+          ]);
+
+          const renderRoute = loadModule(cb);
+
+          importModules.then(([reducer, sagas, component]) => {
+            injectReducer('trips', reducer.default);
+            injectSagas(sagas.default);
+            renderRoute(component);
+          });
+
+          importModules.catch(errorLoading);
+        },
+      }
     }, {
       onEnter: redirectToDashboard,
       path: '/login',
@@ -55,6 +75,7 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
+    }, {
     }, {
       path: '*',
       name: 'notfound',
