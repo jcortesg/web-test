@@ -10,3 +10,6 @@
  */
 
 export const DEFAULT_LOCALE = 'en';
+export const URL_BASE = 'http://localhost:4000';
+export const SET_ERROR_STATE    = 'App/SET_ERROR_STATE';
+export const SET_USER_STATE     = 'App/SET_USER_STATE';

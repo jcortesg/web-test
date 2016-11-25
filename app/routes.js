@@ -14,10 +14,11 @@ const loadModule = (cb) => (componentModule) => {
 
 export default function createRoutes(store) {
   // Create reusable async injectors using getAsyncInjectors factory
-  const { injectReducer, injectSagas } = getAsyncInjectors(store); // eslint-disable-line no-unused-vars
+  const { injectReducer, injectSagas,  checkAuth, redirectToDashboard } = getAsyncInjectors(store); // eslint-disable-line no-unused-vars
 
   return [
     {
+      onEnter: checkAuth,
       path: '/',
       name: 'home',
       getComponent(nextState, cb) {
@@ -28,6 +29,27 @@ export default function createRoutes(store) {
         const renderRoute = loadModule(cb);
 
         importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      onEnter: redirectToDashboard,
+      path: '/login',
+      name: 'loginPage',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          System.import('containers/LoginPage/reducer'),
+          System.import('containers/LoginPage/sagas'),
+          System.import('containers/LoginPage/index.jsx'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('loginPage', reducer.default);
+          injectSagas(sagas.default);
           renderRoute(component);
         });
 

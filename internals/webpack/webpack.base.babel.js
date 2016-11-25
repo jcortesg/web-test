@@ -13,11 +13,16 @@ module.exports = (options) => ({
   }, options.output), // Merge with env dependent settings
   module: {
     loaders: [{
-      test: /\.js$/, // Transform all .js files required somewhere with Babel
+      test: /\.(js|jsx)$/,
       loader: 'babel',
       exclude: /node_modules/,
       query: options.babelQuery,
-    }, {
+    },{
+      test: /\.scss$/,
+      exclude: /node_modules/,
+      loaders: ['style', 'css', 'sass'],
+
+    },{
       // Do not transform vendor's CSS with CSS-modules
       // The point is that they remain in global scope.
       // Since we require these CSS files in our JS or CSS files,
